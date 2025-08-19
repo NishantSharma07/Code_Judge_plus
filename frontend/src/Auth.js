@@ -18,6 +18,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState(localStorage.getItem("cj_username") || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -25,10 +26,17 @@ export default function Auth() {
     e.preventDefault();
     setError("");
     try {
+      if (!isLogin && name.trim().length < 2) {
+        setError("Please enter your name (at least 2 characters).");
+        return;
+      }
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
+        // Store name for greeting if already signed up previously
+        if (name.trim()) localStorage.setItem("cj_username", name.trim());
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
+        localStorage.setItem("cj_username", name.trim());
       }
     } catch (err) {
       setError(err.message);
@@ -42,7 +50,7 @@ export default function Auth() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #e3f2fd 0%, #fff 100%)",
+        background: "linear-gradient(135deg, #e3f2fd 0%, #fff 100%)"
       }}
     >
       <Paper
@@ -50,8 +58,8 @@ export default function Auth() {
         sx={{
           padding: 4,
           borderRadius: 3,
-          width: 340,
-          maxWidth: "90vw",
+          width: 350,
+          maxWidth: "90vw"
         }}
       >
         <Stack spacing={2} alignItems="center">
@@ -60,6 +68,16 @@ export default function Auth() {
             {isLogin ? "Login" : "Sign Up"}
           </Typography>
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+            {!isLogin && (
+              <TextField
+                label="Your Name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                fullWidth
+                margin="normal"
+                required
+              />
+            )}
             <TextField
               label="Email"
               type="email"
