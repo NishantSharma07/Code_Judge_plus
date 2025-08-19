@@ -122,6 +122,6 @@ export default function Auth() {
           )}
         </Stack>
       </Paper>
-    </Box>
+    </Boxa>
   );
 }
